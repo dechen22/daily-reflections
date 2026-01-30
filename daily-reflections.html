@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Reflections</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #C49A93 0%, #B08580 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            background: #F5F1EA;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            max-width: 700px;
+            width: 100%;
+            padding: 48px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2D2D2D;
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .day-display {
+            font-size: 1em;
+            color: #B08580;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .reflection-section {
+            margin-bottom: 32px;
+            padding: 24px;
+            background: #FFFFFF;
+            border: 1px solid #E5E0D8;
+            border-radius: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .reflection-section:hover {
+            box-shadow: 0 4px 16px rgba(196, 154, 147, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .reflection-title {
+            font-size: 1.15em;
+            color: #2D2D2D;
+            margin-bottom: 16px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .reflection-item {
+            margin: 12px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.95em;
+            line-height: 1.7;
+            color: #5A5A5A;
+        }
+
+        .reflection-item:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #C49A93;
+            font-weight: bold;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            gap: 12px;
+        }
+
+        button {
+            background: #C49A93;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            letter-spacing: 0.3px;
+        }
+
+        button:hover {
+            background: #B08580;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(196, 154, 147, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 32px 24px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .reflection-title {
+                font-size: 1.05em;
+            }
+
+            .reflection-item {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Daily Reflections</h1>
+            <div class="day-display" id="dayDisplay"></div>
+        </div>
+
+        <div id="reflections"></div>
+
+        <div class="nav-buttons">
+            <button onclick="previousDay()">← Previous Day</button>
+            <button onclick="nextDay()">Next Day →</button>
+        </div>
+    </div>
+
+    <script>
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        const reflections = {
+            impermanence: [
+                "This body will age, become ill, and die.",
+                "I will die; the time of my death is uncertain.",
+                "This moment is part of preparing for death.",
+                "There is no guarantee of time remaining.",
+                "All beings experience suffering and separation.",
+                "Nothing remains fixed; all conditions change.",
+                "Clinging does not prevent loss or pain.",
+                "Relationships, possessions, and roles will change.",
+                "The present moment is fleeting."
+            ],
+            renunciation: [
+                "There is no solution to the suffering of samsara; it cannot be fixed.",
+                "However positive worldly life may seem, ultimately it will fail.",
+                "Until we see samsara as a terminal illness, genuine aspiration to practice cannot arise.",
+                "We have no ultimate control over life; recognizing this opens the path.",
+                "Disgust and revulsion for samsara can be trained; repeated reflection develops genuine renunciation.",
+                "Seeking liberation is more important than immediately finding it.",
+                "Worldly achievements cannot bring ultimate satisfaction.",
+                "Attachment to wealth, status, or comfort is inherently unstable.",
+                "Recognizing samsara's limitations clarifies the path to freedom.",
+                "Spiritual seeking arises naturally when samsara's insufficiency is recognized."
+            ],
+            emptiness: [
+                "Nothing exists independently; all phenomena arise in relation.",
+                "There is no fixed self in the flow of mind and body.",
+                "Thoughts and sensations appear, change, and dissolve without a controller.",
+                "Events arise due to causes and conditions, not by themselves.",
+                "Awareness reveals phenomena as empty yet vividly present.",
+                "Experience does not divide into separate 'self' and 'other'; the boundary is a perception, not a fact.",
+                "The sense of a solid, separate self dissolves when awareness is seen directly.",
+                "What we call 'I' is a process of sensing, thinking, and acting, not an independent object.",
+                "The boundary between inner and outer experience arises in the mind, not in reality itself.",
+                "Subject and object are not two fixed things; they are co‑arising events.",
+                "Awareness does not belong to a separate self — it is the field in which everything appears."
+            ],
+            selfCompassion: [
+                "How do I feel right now?",
+                "Difficulty arises, as it arises for all beings.",
+                "May I be free of the suffering, free from anger, irritation, pain, addictions, attachment.",
+                "The body and mind experience tension and ease.",
+                "All beings, including this one, face impermanence.",
+                "Discomfort and struggle are part of the human condition.",
+                "No experience needs to be fixed; it is as it is.",
+                "All phenomena, including myself, arise and dissolve.",
+                "May I have all that I wish for myself",
+                "May I have all that I need to serve all beings",
+                "May everything that happens in my life will help me get closer to Enlightenment"
+            ],
+            bodhicitta: [
+                "All my happiness comes from the kindness of beings.",
+                "All beings have been my mothers in past lives.",
+                "The purpose of my life is to attain Buddhahood for the benefit of all beings.",
+                "I practice not for myself alone, but for the freedom of all beings.",
+                "May my actions be guided by care and compassion.",
+                "The kindness of others supports every moment of my life.",
+                "Compassion arises naturally when we recognize the suffering of beings.",
+                "Every being I encounter has shown me some form of care in the past.",
+                "May my practice benefit those who have helped sustain me.",
+                "Acting for others and self are not separate in the path to awakening."
+            ],
+            dedication: [
+                "May all beings be free from suffering and its causes.",
+                "May all beings find happiness and peace.",
+                "May I continue steadily on the path, with clarity and awareness.",
+                "May I have the resources and conditions to sustain my practice.",
+                "May I have a fulfilling and rewarding job",
+                "May my actions benefit others as well as myself.",
+                "May my life be a support to others' practice and freedom.",
+                "May all beings have the conditions to practice Dharma.",
+                "May clarity and insight arise naturally in my mind.",
+                "May the seeds of awakening grow in all beings.",
+                "May my dedication strengthen with each passing day."
+            ]
+        };
+
+        let currentDayIndex = new Date().getDay();
+
+        function getReflectionsForDay(dayIndex) {
+            const selections = {
+                impermanence: [],
+                renunciation: [],
+                emptiness: [],
+                selfCompassion: [],
+                bodhicitta: [],
+                dedication: []
+            };
+
+            // Select 1-2 items from each category based on day
+            Object.keys(reflections).forEach((category, catIndex) => {
+                const items = reflections[category];
+                const count = (dayIndex + catIndex) % 2 === 0 ? 2 : 1;
+                
+                for (let i = 0; i < count; i++) {
+                    const index = (dayIndex * 3 + catIndex * 2 + i) % items.length;
+                    selections[category].push(items[index]);
+                }
+            });
+
+            return selections;
+        }
+
+        function renderReflections() {
+            const daySelections = getReflectionsForDay(currentDayIndex);
+
+            document.getElementById('dayDisplay').textContent = days[currentDayIndex];
+
+            const reflectionsHTML = `
+                <div class="reflection-section">
+                    <div class="reflection-title">Impermanence</div>
+                    ${daySelections.impermanence.map(r => `<div class="reflection-item">${r}</div>`).join('')}
+                </div>
+
+                <div class="reflection-section">
+                    <div class="reflection-title">Renunciation</div>
+                    ${daySelections.renunciation.map(r => `<div class="reflection-item">${r}</div>`).join('')}
+                </div>
+
+                <div class="reflection-section">
+                    <div class="reflection-title">Emptiness</div>
+                    ${daySelections.emptiness.map(r => `<div class="reflection-item">${r}</div>`).join('')}
+                </div>
+
+                <div class="reflection-section">
+                    <div class="reflection-title">Self-Compassion</div>
+                    ${daySelections.selfCompassion.map(r => `<div class="reflection-item">${r}</div>`).join('')}
+                </div>
+
+                <div class="reflection-section">
+                    <div class="reflection-title">Bodhicitta</div>
+                    ${daySelections.bodhicitta.map(r => `<div class="reflection-item">${r}</div>`).join('')}
+                </div>
+
+                <div class="reflection-section">
+                    <div class="reflection-title">Dedication & Aspiration</div>
+                    ${daySelections.dedication.map(r => `<div class="reflection-item">${r}</div>`).join('')}
+                </div>
+            `;
+
+            document.getElementById('reflections').innerHTML = reflectionsHTML;
+        }
+
+        function nextDay() {
+            currentDayIndex = (currentDayIndex + 1) % 7;
+            renderReflections();
+        }
+
+        function previousDay() {
+            currentDayIndex = (currentDayIndex - 1 + 7) % 7;
+            renderReflections();
+        }
+
+        // Initialize
+        renderReflections();
+    </script>
+</body>
+</html>
